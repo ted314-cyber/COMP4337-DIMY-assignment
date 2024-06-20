@@ -1,6 +1,7 @@
 import os
 import time
 import socket
+import random
 from secretsharing import SecretSharer
 
 def generate_ephemeral_id(): # task 1
@@ -23,6 +24,10 @@ def broadcast_shares(shares):
     port = 50000  # Arbitrary non-privileged port
 
     for share in shares:
+        if random.random() < 0.5:  # 50% chance to drop the message
+            print(f"Share Dropped: {share}")
+            continue  # Skip sending this share
+        
         sock.sendto(share.encode(), (broadcast_ip, port))
         print(f"Broadcasted Share: {share}")
         time.sleep(3)  # Wait for 3 seconds before sending the next share
