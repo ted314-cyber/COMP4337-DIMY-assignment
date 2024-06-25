@@ -2,6 +2,8 @@ import os
 import time
 import socket
 import random
+import hashlib
+import threading
 from secretsharing import SecretSharer
 
 def generate_ephemeral_id(): # task 1
@@ -16,38 +18,70 @@ def split_ephemeral_id(eph_id, n=5, k=3):
     shares = SecretSharer.split_secret(hex_eph_id, k, n)
     return shares
 
-def broadcast_shares(shares):
-    """Broadcasts each share over UDP with error handling."""
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        broadcast_ip = '255.255.255.255'  # Local network broadcast IP
-        port = 50000  # Arbitrary non-privileged port
-
-        for share in shares:
-            if random.random() < 0.5:  # 50% chance to drop the message
-                print(f"Share Dropped: {share}")
-                continue  # Skip sending this share
-            
-            sock.sendto(share.encode(), (broadcast_ip, port))
-            print(f"Broadcasted Share: {share}")
-            time.sleep(3)  # Wait for 3 seconds before sending the next share
-    except Exception as e:
-        print(f"An error occurred during broadcasting: {e}")
-    finally:
-        sock.close()
-
-def main():
+def broadcast_shares():
+    """Broadcasts shares over UDP with error handling in a loop."""
     while True:
         eph_id = generate_ephemeral_id()
-        print(f"EphID Generated: {eph_id.hex()}")  # Print the hex representation of EphID
-        
-        # Splitting the EphID into shares (task 2)
+        print(f"EphID Generated: {eph_id.hex()}")
         shares = split_ephemeral_id(eph_id)
-        # Broadcasting shares (task 3)
-        broadcast_shares(shares)
+
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            broadcast_ip = '255.255.255.255'
+            port = 50000
+
+            for share in shares:
+                if random.random() < 0.5:
+                    print(f"Share Dropped: {share}")
+                    continue
+                
+                sock.sendto(share.encode(), (broadcast_ip, port))
+                print(f"Broadcasted Share: {share}")
+                time.sleep(3)  # Sleep between each share to mimic the broadcast delay
+        except Exception as e:
+            print(f"An error occurred during broadcasting: {e}")
+        finally:
+            sock.close()
         
-        time.sleep(15)  # Wait for 15 seconds before generating the next EphID
+        time.sleep(12)  # Adjusted to sync with the overall cycle of EphID generation
+
+def listen_for_shares():
+    """Listens for shares and attempts to reconstruct the EphID when sufficient shares are collected."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(('', 50000))
+    shares_collected = {}
+
+    while True:
+        data, _ = sock.recvfrom(1024)
+        share = data.decode()
+        print(f"Received Share: {share}")
+
+        # Simple logic to collect and check shares
+        if share not in shares_collected:
+            shares_collected[share] = []
+        shares_collected[share].append(share)
+
+        if len(shares_collected[share]) >= 3:
+            try:
+                reconstructed_hex_eph_id = SecretSharer.recover_secret(shares_collected[share][:3])
+                reconstructed_eph_id = bytes.fromhex(reconstructed_hex_eph_id)
+                print(f"Reconstructed EphID: {reconstructed_hex_eph_id}")
+
+                hash_digest = hashlib.sha256(reconstructed_eph_id).hexdigest()
+                print(f"Verification Hash: {hash_digest}")
+            except Exception as e:
+                print(f"Error reconstructing EphID: {e}")
+
+def main():
+    broadcaster = threading.Thread(target=broadcast_shares)
+    listener = threading.Thread(target=listen_for_shares)
+    
+    broadcaster.start()
+    listener.start()
+
+    broadcaster.join()
+    listener.join()
 
 if __name__ == "__main__":
     main()
