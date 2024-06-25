@@ -17,22 +17,25 @@ def split_ephemeral_id(eph_id, n=5, k=3):
     return shares
 
 def broadcast_shares(shares):
-    """Broadcasts each share over UDP."""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    broadcast_ip = '255.255.255.255'  # Local network broadcast IP
-    port = 50000  # Arbitrary non-privileged port
+    """Broadcasts each share over UDP with error handling."""
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        broadcast_ip = '255.255.255.255'  # Local network broadcast IP
+        port = 50000  # Arbitrary non-privileged port
 
-    for share in shares:
-        if random.random() < 0.5:  # 50% chance to drop the message
-            print(f"Share Dropped: {share}")
-            continue  # Skip sending this share
-        
-        sock.sendto(share.encode(), (broadcast_ip, port))
-        print(f"Broadcasted Share: {share}")
-        time.sleep(3)  # Wait for 3 seconds before sending the next share
-
-    sock.close()
+        for share in shares:
+            if random.random() < 0.5:  # 50% chance to drop the message
+                print(f"Share Dropped: {share}")
+                continue  # Skip sending this share
+            
+            sock.sendto(share.encode(), (broadcast_ip, port))
+            print(f"Broadcasted Share: {share}")
+            time.sleep(3)  # Wait for 3 seconds before sending the next share
+    except Exception as e:
+        print(f"An error occurred during broadcasting: {e}")
+    finally:
+        sock.close()
 
 def main():
     while True:
