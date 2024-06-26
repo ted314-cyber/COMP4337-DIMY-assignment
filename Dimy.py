@@ -1,97 +1,117 @@
-import os
-import time
-import socket
-import random
+#!/usr/bin/env python3
+
 import hashlib
+import binascii
 import threading
-from secretsharing import SecretSharer
+import socket
+import time
+import random
+from ecdsa import ECDH, SECP128r1
+from Crypto.Protocol.SecretSharing import Shamir
+from Crypto.Random import get_random_bytes
 
-def generate_ephemeral_id(): # task 1
-    """Generates a 32-byte random EphID."""
-    return os.urandom(32)  # Generates 32 bytes of random data
+# Global variables for network communication
+server = None
+client = None
+server_url = 'http://127.0.0.1:55000'
+print_lock = threading.Lock()  # Global lock for synchronized printing
+task_completed = threading.Event()  # Event to synchronize task completion
 
-def split_ephemeral_id(eph_id, n=5, k=3): # task 2  
-    """Splits the EphID into n shares such that any k shares can reconstruct the EphID."""
-    # Convert EphID bytes to hex string as required by the SecretSharer library
-    hex_eph_id = eph_id.hex()
-    # Splitting the hex string into shares
-    shares = SecretSharer.split_secret(hex_eph_id, k, n)
+def safe_print(*args, **kwargs):
+    """Thread-safe print function."""
+    with print_lock:
+        print(*args, **kwargs)
+
+############################## Task 1 ##############################
+def generate_ephemeral_id():
+    """Task 1: Generates a 16 Byte ephemeral ID using ECDH"""
+    ecdh = ECDH(curve=SECP128r1)
+    ecdh.generate_private_key()
+    public_key = ecdh.get_public_key()
+    ephemeral_id = public_key.to_string('compressed')[1:]
+    safe_print("\n------------------> Segment 1 <------------------")
+    safe_print(f"Task 1: Generated EphID: {binascii.hexlify(ephemeral_id).decode()}")
+    task_completed.set()  # Signal that Task 1 is complete
+    return ephemeral_id, ecdh
+
+def generate_hash(ephemeral_id):
+    """Generates a SHA-256 hash of the ephemeral ID"""
+    return hashlib.sha256(ephemeral_id).hexdigest()
+
+############################## Task 2 ##############################
+def generate_shares(ephemeral_id, k=3, n=5):
+    """Task 2: Generates n shares of the EphID using k-out-of-n Shamir Secret Sharing"""
+    task_completed.wait()  # Wait for Task 1 to complete
+    task_completed.clear()  # Clear event for the next task
+    shares = Shamir.split(k, n, ephemeral_id)
+    safe_print("\n------------------> Segment 2 <------------------")
+    safe_print(f"Task 2: Generated {n} shares for EphID:")
+    for i, share in enumerate(shares):
+        safe_print(f"  Share {i+1}: {share}")
+    task_completed.set()  # Signal that Task 2 is complete
     return shares
 
-def broadcast_shares(): # task 3 + 3a
-    """Broadcasts shares over UDP with error handling in a loop."""
+def ephemeral_id_routine():
+    """Thread routine to generate ephemeral ID, its hash, and shares every 15 seconds"""
     while True:
-        eph_id = generate_ephemeral_id()
-        hex_eph_id = eph_id.hex()
-        print(f"EphID Generated: {hex_eph_id}")
-        shares = split_ephemeral_id(eph_id)
-        eph_id_hash = hashlib.sha256(eph_id).hexdigest()
+        ephemeral_id, ecdh = generate_ephemeral_id()
+        hash_eph_id = generate_hash(ephemeral_id)
+        shares = generate_shares(ephemeral_id)
+        time.sleep(15)
 
-        try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            broadcast_ip = '255.255.255.255'
-            port = 50000
-
-            for share in shares:
-                share_data = f"{eph_id_hash}:{share}"
-                if random.random() < 0.5:
-                    print(f"Share Dropped: {share_data}")
-                    continue
-                
-                sock.sendto(share.encode(), (broadcast_ip, port))
-                print(f"Broadcasted Share: {share_data}")
-                time.sleep(3)  # Sleep between each share to mimic the broadcast delay
-        except Exception as e:
-            print(f"An error occurred during broadcasting: {e}")
-        finally:
-            sock.close()
-        
-        time.sleep(12)  # Adjusted to sync with the overall cycle of EphID generation
-
-def listen_for_shares(): # task 
-    """Listens for shares and attempts to reconstruct the EphID when sufficient shares are collected."""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(('', 50000))
-    shares_collected = {}
-    eph_id_hashes = {}
+############################## Task 3 & 3a ##############################
+def broadcast_shares():
+    """Task 3: Broadcasts shares over UDP with random drops"""
+    global server
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    server.bind(("", 44444))
 
     while True:
-        data, _ = sock.recvfrom(1024)
-        share_data = data.decode()
-        hash_value, share = share_data.split(':', 1)
-        print(f"Received Share: {share} for Hash: {hash_value}")
+        task_completed.wait()  # Wait for Task 2 to complete
+        task_completed.clear()  # Clear event for the next task
+        ephemeral_id, _ = generate_ephemeral_id()
+        shares = generate_shares(ephemeral_id)
+        for share in shares:
+            safe_print("\n------------------> Segment 3 <------------------")
+            safe_print(f"Task 3: Preparing to broadcast Share {share[0]}")
+            if random.random() < 0.5:
+                safe_print(f"Task 3a: Dropping share {share[0]}")
+                continue
+            share_bytes = str.encode(f"{share[0]}, {binascii.hexlify(share[1])}")
+            server.sendto(share_bytes, ('<broadcast>', 37025))
+            safe_print(f"Task 3: Broadcasting share {share[0]}")
+            time.sleep(3)
+        task_completed.set()  # Signal that Task 3 is complete
 
-        if hash_value not in shares_collected:
-            shares_collected[hash_value] = []
-            eph_id_hashes[hash_value] = hash_value
+############################## Task 4 ##############################
+def receive_shares():
+    """Receives shares from other devices"""
+    global client
+    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    client.bind(("", 37025))
 
-        shares_collected[hash_value].append(share)
-
-        if len(shares_collected[hash_value]) >= 3:
-            try:
-                reconstructed_hex_eph_id = SecretSharer.recover_secret(shares_collected[hash_value][:3])
-                reconstructed_eph_id = bytes.fromhex(reconstructed_hex_eph_id)
-                reconstructed_hash = hashlib.sha256(reconstructed_eph_id).hexdigest()
-
-                print(f"Reconstructed EphID: {reconstructed_hex_eph_id}")
-                print(f"Verification Hash: {reconstructed_hash}")
-                if reconstructed_hash == eph_id_hashes[hash_value]:
-                    print("Verification Successful")
-                else:
-                    print("Verification Failed")
-            except Exception as e:
-                print(f"Error reconstructing EphID: {e}")
+    while True:
+        data, _ = client.recvfrom(1024)
+        share = data.decode()
+        safe_print("\n------------------> Segment 4 <------------------")
+        safe_print(f"Task 4: Received share: {share}")
 
 def main():
-    broadcaster = threading.Thread(target=broadcast_shares)
-    listener = threading.Thread(target=listen_for_shares)
-    
-    broadcaster.start()
-    listener.start()
+    ephemeral_id_thread = threading.Thread(target=ephemeral_id_routine, name="EphemeralIDGenerator")
+    sender_thread = threading.Thread(target=broadcast_shares, name="ShareBroadcaster")
+    receiver_thread = threading.Thread(target=receive_shares, name="ShareReceiver")
 
-    broadcaster.join()
-    listener.join()
+    ephemeral_id_thread.start()
+    sender_thread.start()
+    receiver_thread.start()
+
+    ephemeral_id_thread.join()
+    sender_thread.join()
+    receiver_thread.join()
 
 if __name__ == "__main__":
     main()
