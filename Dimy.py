@@ -88,13 +88,14 @@ class ShareManager:
         while True:
             ephemeral_id, _ = generate_ephemeral_id()
             shares = generate_shares(ephemeral_id)
+            hash_ephID = generate_hash(ephemeral_id)
             for share in shares:
                 safe_print("\n------------------> Segment 3 <------------------")
                 safe_print("Task 3: Preparing to broadcast Share", share[0])
                 if random.random() < 0.5:
                     safe_print("Task 3a: Dropping share", share[0])
                     continue
-                share_data = f"{share[0]}, {binascii.hexlify(share[1]).decode()}"
+                share_data = f"{share[0]}, {binascii.hexlify(share[1]).decode()}, {hash_ephID}"
                 self.server_socket.sendto(share_data.encode(), ('<broadcast>', 37025))
                 safe_print("Task 3: Broadcasting share", share[0])
                 time.sleep(3)
@@ -103,23 +104,41 @@ class ShareManager:
         """Listens for shares and processes them."""
         while True:
             data, _ = self.client_socket.recvfrom(1024)
-            share_num, share = self.parse_share(data.decode())
-            self.process_received_share(share_num, share)
+            share_num, share, recv_hash_ephID = self.parse_share(data.decode())
+            self.process_received_share(share_num, share, recv_hash_ephID)
+            self.attempt_reconstruction(recv_hash_ephID)
 
     def parse_share(self, data):
-        share_num, share = data.split(',')
-        return int(share_num), share.strip()
+        parts = data.split(',')
+        share_num = int(parts[0].strip())
+        share = binascii.unhexlify(parts[1].strip())
+        recv_hash_ephID = parts[2].strip()
+        return share_num, share, recv_hash_ephID
 
-    def process_received_share(self, share_num, share):
-        if share not in self.received_shares:
-            self.received_shares[share] = []
-        self.received_shares[share].append(share_num)
-        safe_print(f"Task 3b: Received share {share_num} for hash {share}")
-        safe_print(f"Task 3c: Total shares received for hash {share}: {len(self.received_shares[share])}")
+    def process_received_share(self, share_num, share, recv_hash_ephID):
+        if recv_hash_ephID not in self.received_shares:
+            self.received_shares[recv_hash_ephID] = []
+        self.received_shares[recv_hash_ephID].append((share_num, share))
+        safe_print(f"Task 3b: Received share {share_num} for hash {recv_hash_ephID}")
+        safe_print(f"Task 3c: Total shares received for hash {recv_hash_ephID}: {len(self.received_shares[recv_hash_ephID])}")
+
+############################## Task 4 ##############################
+    def attempt_reconstruction(self, recv_hash_ephID):
+        if len(self.received_shares[recv_hash_ephID]) >= 3:
+            safe_print(f"\n------------------> Segment 4 <------------------")
+            safe_print(f"Task 4-A: Attempting to reconstruct EphID for hash {recv_hash_ephID}")
+            shares = self.received_shares[recv_hash_ephID][:3]
+            reconstructed_ephID = Shamir.combine(shares)
+            reconstructed_hash = generate_hash(reconstructed_ephID)
+            if reconstructed_hash == recv_hash_ephID:
+                safe_print(f"Task 4-B: Successfully verified EphID: {binascii.hexlify(reconstructed_ephID).decode()}")
+            else:
+                safe_print("Task 4-B: Failed to verify reconstructed EphID")
 
     def start(self):
         threading.Thread(target=self.broadcast_shares, name="BroadcastThread", daemon=True).start()
         threading.Thread(target=self.listen_for_shares, name="ListenThread", daemon=True).start()
+
 
 def main():
     stop_printing = threading.Event()
