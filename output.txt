@@ -1,0 +1,152 @@
+------------------> Segment 1 <------------------
+Task 1: Generated EphID: e5b317fda30044661611b39f6874b88a
+Task 1: EphID Hash: 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+
+------------------> Segment 2 <------------------
+Task 2: Generated 5 shares for EphID:
+Ephemeral_id used in this segment: e5b317fda30044661611b39f6874b88a
+  Share 1 : (1, c473b38c0b45f7ac1395fd6cce0dea3c)
+  Share 2 : (2, 10ed7500b1107621e4b2f29e29bbce4c)
+  Share 3 : (3, 312dd1711955c5ebe136bc6d8fc29cfa)
+  Share 4 : (4, d4737a7e8d4d77a615f84205df1d1a27)
+  Share 5 : (5, f5b3de0f2508c46c107c0cf679644891)
+
+------------------> Segment 3 <------------------
+Task 3: Preparing to broadcast Share 1 with data 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183,1,c473b38c0b45f7ac1395fd6cce0dea3c,03e5b317fda30044661611b39f6874b88a
+Task 3b: Received share 1 for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Task 3c: Total shares received for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: 1
+Collected public keys for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: ['03e5b317fda30044661611b39f6874b88a']
+Not enough shares yet for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183. Continuing to collect.
+
+------------------> Segment 3 <------------------
+Task 3: Preparing to broadcast Share 2 with data 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183,2,10ed7500b1107621e4b2f29e29bbce4c,03e5b317fda30044661611b39f6874b88a
+Task 3b: Received share 2 for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Task 3c: Total shares received for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: 2
+Collected public keys for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: ['03e5b317fda30044661611b39f6874b88a']
+Not enough shares yet for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183. Continuing to collect.
+
+------------------> Segment 3 <------------------
+Task 3: Preparing to broadcast Share 3 with data 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183,3,312dd1711955c5ebe136bc6d8fc29cfa,03e5b317fda30044661611b39f6874b88a
+Task 3b: Received share 3 for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Task 3c: Total shares received for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: 3
+Collected public keys for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: ['03e5b317fda30044661611b39f6874b88a']
+Collected enough shares for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183. Attempting reconstruction.
+
+------------------> Segment 4-A <------------------
+Task 4: Attempting to reconstruct EphID for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Number of shares available: 3
+
+------------------> Segment 4-B <------------------
+Task 4: Verifying reconstructed EphID
+Original EphID: e5b317fda30044661611b39f6874b88a
+Original hash:    9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Reconstructed hash: 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Verification successful: Reconstructed EphID matches the original!
+Own public key for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: 03e5b317fda30044661611b39f6874b88a
+Simulating another node for demonstration purposes.
+Simulated node 1 using curve: SECP128r1, private key: e5b317fda30044661611b39f6874b88a, public key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Simulated node 2 using curve: SECP128r1, private key: e5b317fda30044661611b39f6874b88a, public key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+
+------------------> Segment 5-A <------------------
+Task 5: Performing Diffie-Hellman key exchange.
+Own Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Peer Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Length of own public key: 17
+Length of peer public key: 17
+Match found for compressed encoding.
+Error during Diffie-Hellman exchange: Curve mismatch.
+
+------------------> Segment 5-A <------------------
+Task 5: Performing Diffie-Hellman key exchange.
+Own Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Peer Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Length of own public key: 17
+Length of peer public key: 17
+Match found for compressed encoding.
+Error during Diffie-Hellman exchange: Curve mismatch.
+Error: Nodes have NOT arrived at the same EncID value.
+Successfully reconstructed EphID: e5b317fda30044661611b39f6874b88a
+
+------------------> Segment 3 <------------------
+Task 3: Preparing to broadcast Share 4 with data 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183,4,d4737a7e8d4d77a615f84205df1d1a27,03e5b317fda30044661611b39f6874b88a
+Task 3b: Received share 4 for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Task 3c: Total shares received for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: 4
+Collected public keys for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: ['03e5b317fda30044661611b39f6874b88a']
+Collected enough shares for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183. Attempting reconstruction.
+
+------------------> Segment 4-A <------------------
+Task 4: Attempting to reconstruct EphID for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Number of shares available: 4
+
+------------------> Segment 4-B <------------------
+Task 4: Verifying reconstructed EphID
+Original EphID: e5b317fda30044661611b39f6874b88a
+Original hash:    9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Reconstructed hash: 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Verification successful: Reconstructed EphID matches the original!
+Own public key for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: 03e5b317fda30044661611b39f6874b88a
+Simulating another node for demonstration purposes.
+Simulated node 1 using curve: SECP128r1, private key: e5b317fda30044661611b39f6874b88a, public key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Simulated node 2 using curve: SECP128r1, private key: e5b317fda30044661611b39f6874b88a, public key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+
+------------------> Segment 5-A <------------------
+Task 5: Performing Diffie-Hellman key exchange.
+Own Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Peer Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Length of own public key: 17
+Length of peer public key: 17
+Match found for compressed encoding.
+Error during Diffie-Hellman exchange: Curve mismatch.
+
+------------------> Segment 5-A <------------------
+Task 5: Performing Diffie-Hellman key exchange.
+Own Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Peer Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Length of own public key: 17
+Length of peer public key: 17
+Match found for compressed encoding.
+Error during Diffie-Hellman exchange: Curve mismatch.
+Error: Nodes have NOT arrived at the same EncID value.
+Successfully reconstructed EphID: e5b317fda30044661611b39f6874b88a
+
+------------------> Segment 3 <------------------
+Task 3: Preparing to broadcast Share 5 with data 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183,5,f5b3de0f2508c46c107c0cf679644891,03e5b317fda30044661611b39f6874b88a
+Task 3b: Received share 5 for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Task 3c: Total shares received for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: 5
+Collected public keys for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: ['03e5b317fda30044661611b39f6874b88a']
+Collected enough shares for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183. Attempting reconstruction.
+
+------------------> Segment 4-A <------------------
+Task 4: Attempting to reconstruct EphID for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Number of shares available: 5
+
+------------------> Segment 4-B <------------------
+Task 4: Verifying reconstructed EphID
+Original EphID: e5b317fda30044661611b39f6874b88a
+Original hash:    9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Reconstructed hash: 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183
+Verification successful: Reconstructed EphID matches the original!
+Own public key for hash 9430a2d29b7e2e6fb82c69eebbd3c187a42a2fe82cb3ceedb0e9351fa4088183: 03e5b317fda30044661611b39f6874b88a
+Simulating another node for demonstration purposes.
+Simulated node 1 using curve: SECP128r1, private key: e5b317fda30044661611b39f6874b88a, public key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Simulated node 2 using curve: SECP128r1, private key: e5b317fda30044661611b39f6874b88a, public key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+
+------------------> Segment 5-A <------------------
+Task 5: Performing Diffie-Hellman key exchange.
+Own Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Peer Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Length of own public key: 17
+Length of peer public key: 17
+Match found for compressed encoding.
+Error during Diffie-Hellman exchange: Curve mismatch.
+
+------------------> Segment 5-A <------------------
+Task 5: Performing Diffie-Hellman key exchange.
+Own Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Peer Public Key: 023deab808d6ddd2a8c8cc77d6f1d9cbb6
+Length of own public key: 17
+Length of peer public key: 17
+Match found for compressed encoding.
+Error during Diffie-Hellman exchange: Curve mismatch.
+Error: Nodes have NOT arrived at the same EncID value.
+Successfully reconstructed EphID: e5b317fda30044661611b39f6874b88a
