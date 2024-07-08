@@ -43,6 +43,7 @@ def generate_ephemeral_id():
 
 def generate_hash(ephemeral_id):
     """Generates a SHA-256 hash of the ephemeral ID"""
+    safe_print("Hash:", hashlib.sha256(ephemeral_id).hexdigest())
     return hashlib.sha256(ephemeral_id).hexdigest()
 
 ############################## Task 2 ##############################
@@ -108,10 +109,11 @@ class ShareManager:
         while True:
             self.generate_new_ephid_and_shares()
             for share in self.current_shares:
+                share_value_hex = binascii.hexlify(share[1]).decode()
                 safe_print("\n------------------> Segment 3 <------------------")
                 safe_print("Task 3: Preparing to broadcast Share", share[0])
-                if random.random() < 0.1:
-                    safe_print("Task 3a: Dropping share", share[0])
+                if random.random() < 0.5:
+                    safe_print(f"Task 3a: Dropping share {share[0]} with value {share_value_hex}")
                     continue
                 share_data = (
                     f"{share[0]}, {binascii.hexlify(share[1]).decode()}, {self.current_hash}"
@@ -147,7 +149,7 @@ class ShareManager:
         self.received_shares[recv_hash_ephID].append((share_num, share))
         safe_print(f"Task 3b: Received share {share_num} for hash {recv_hash_ephID}")
         safe_print(
-            f"Task 3c: Total shares received for hash {recv_hash_ephID}: {len(self.received_shares[recv_hash_ephID])}"
+            f"Task 3c: Total shares received for hash {recv_hash_ephID}: {len(self.received_shares[recv_hash_ephID])}, share value {binascii.hexlify(share).decode()}"
         )
 
     ############################## Task 4 ##############################
