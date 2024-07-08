@@ -77,6 +77,8 @@ class ShareManager:
         self.ecdh = ECDH(curve=SECP128r1)
         self.ecdh.generate_private_key()
         self.computed_encID = None
+        self.current_ephid = None
+        self.current_shares = None
 
     def setup_server_socket(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -102,21 +104,25 @@ class ShareManager:
     def broadcast_shares(self):
         """Broadcasts shares over UDP with random drops."""
         while True:
-            ephemeral_id, _ = generate_ephemeral_id()
-            shares = generate_shares(ephemeral_id)
-            hash_ephID = generate_hash(ephemeral_id)
-            for share in shares:
+            self.generate_new_ephid_and_shares()
+            for share in self.current_shares:
                 safe_print("\n------------------> Segment 3 <------------------")
                 safe_print("Task 3: Preparing to broadcast Share", share[0])
                 if random.random() < 0.1:
                     safe_print("Task 3a: Dropping share", share[0])
                     continue
                 share_data = (
-                    f"{share[0]}, {binascii.hexlify(share[1]).decode()}, {hash_ephID}"
+                    f"{share[0]}, {binascii.hexlify(share[1]).decode()}, {self.current_hash}"
                 )
                 self.server_socket.sendto(share_data.encode(), ("<broadcast>", 37025))
                 safe_print("Task 3: Broadcasting share", share[0])
                 time.sleep(3)
+            time.sleep(15)  # Wait for 15 seconds before generating a new EphID
+
+    def generate_new_ephid_and_shares(self):
+        self.current_ephid, _ = generate_ephemeral_id()
+        self.current_shares = generate_shares(self.current_ephid)
+        self.current_hash = generate_hash(self.current_ephid)
 
     def listen_for_shares(self):
         """Listens for shares and processes them."""
@@ -218,16 +224,12 @@ def main():
     print_thread = threading.Thread(target=print_manager, args=(stop_printing,))
     print_thread.start()
 
-    ephemeral_id_thread = threading.Thread(
-        target=ephemeral_id_routine, name="EphemeralIDGenerator"
-    )
-    ephemeral_id_thread.start()
-
     manager = ShareManager()
     manager.start()
 
     try:
-        ephemeral_id_thread.join()
+        while True:
+            time.sleep(1)
     except KeyboardInterrupt:
         stop_printing.set()
 
