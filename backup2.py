@@ -52,8 +52,10 @@ def generate_shares(ephemeral_id, k=3, n=5):
     shares = Shamir.split(k, n, ephemeral_id)
     safe_print("\n------------------> Segment 2 <------------------")
     safe_print("Task 2: Generated", n, "shares for EphID:")
+    safe_print("Ephemeral_id used in this segment:", binascii.hexlify(ephemeral_id).decode())
     for i, share in enumerate(shares):
-        safe_print("  Share", i + 1, ":", share)
+        share_hex = binascii.hexlify(share[1]).decode()
+        safe_print(f"  Share {i + 1} : ({share[0]}, {share_hex})")
     return shares
 
 def ephemeral_id_routine():
@@ -154,19 +156,27 @@ class ShareManager:
     def attempt_reconstruction(self, recv_hash_ephID):
         if len(self.received_shares[recv_hash_ephID]) >= 3:
             safe_print(f"\n------------------> Segment 4 <------------------")
-            safe_print(
-                f"Task 4-A: Attempting to reconstruct EphID for hash {recv_hash_ephID}"
-            )
+            safe_print(f"Task 4-A: Attempting to reconstruct EphID for hash {recv_hash_ephID}")
+            safe_print(f"Number of shares available: {len(self.received_shares[recv_hash_ephID])}")
+
             shares = self.received_shares[recv_hash_ephID][:3]
             reconstructed_ephID = Shamir.combine(shares)
+
+            safe_print(f"Task 4-B: Verifying reconstructed EphID")
+            safe_print(f"Original EphID hash:    {recv_hash_ephID}")
+            safe_print(f"Reconstructed EphID: {binascii.hexlify(reconstructed_ephID).decode()}")
+
             reconstructed_hash = generate_hash(reconstructed_ephID)
+            safe_print(f"Reconstructed hash: {reconstructed_hash}")
+
             if reconstructed_hash == recv_hash_ephID:
-                safe_print(
-                    f"Task 4-B: Successfully verified EphID: {binascii.hexlify(reconstructed_ephID).decode()}"
-                )
+                safe_print(f"Task 4-B: Verification successful: Reconstructed EphID matches the original!")
+                safe_print(f"Successfully verified EphID: {binascii.hexlify(reconstructed_ephID).decode()}")
                 self.construct_encID(reconstructed_ephID)  # Task 5
             else:
-                safe_print("Task 4-B: Failed to verify reconstructed EphID")
+                safe_print("Task 4-B: Verification failed: Reconstructed EphID does not match the original.")
+                safe_print(f"Expected hash:   {recv_hash_ephID}")
+                safe_print(f"Calculated hash: {reconstructed_hash}")
 
     ############################## Task 5 ##############################
     # Segment 5-A: Show the nodes computing the shared secret EncID by using DiffieHellman key exchange mechanism.
