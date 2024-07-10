@@ -9,7 +9,29 @@ import random
 import queue
 from ecdsa import ECDH, SECP128r1
 from Crypto.Protocol.SecretSharing import Shamir
-from Crypto.Random import get_random_bytes
+import bitarray
+import mmh3
+
+class BloomFilter:
+    def __init__(self, size=10000, hash_count=3):
+        self.size = size
+        self.hash_count = hash_count
+        self.bit_array = bitarray.bitarray(size)
+        self.bit_array.setall(0)
+
+    def add(self, item):
+        if isinstance(item, str):
+            item = item.encode()
+        for i in range(self.hash_count):
+            digest = mmh3.hash(item, i) % self.size
+            self.bit_array[digest] = 1
+
+    def check(self, item):
+        for i in range(self.hash_count):
+            digest = mmh3.hash(item, i) % self.size
+            if self.bit_array[digest] == 0:
+                return False
+        return True
 
 # Global variables for network communication
 server_url = "http://127.0.0.1:55000"
@@ -24,7 +46,7 @@ def print_manager(stop_event):
     """Manage the printing from the queue in a single thread."""
     while not stop_event.is_set() or not output_queue.empty():
         try:
-            message = output_queue.get(timeout=0.1)  # Timeout to check for stop_event regularly
+            message = output_queue.get(timeout=0.5)  # Timeout to check for stop_event regularly
             print(message)
         except queue.Empty:
             continue
@@ -82,6 +104,7 @@ class ShareManager:
         self.computed_encID = None
         self.current_ephid = None
         self.current_shares = None
+        self.dbf = BloomFilter()
 
     def setup_server_socket(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -112,7 +135,7 @@ class ShareManager:
                 share_value_hex = binascii.hexlify(share[1]).decode()
                 safe_print("\n------------------> Segment 3 <------------------")
                 safe_print("Task 3: Preparing to broadcast Share", share[0])
-                if random.random() < 0.5:
+                if random.random() < 0.1:
                     safe_print(f"Task 3a: Dropping share {share[0]} with value {share_value_hex}")
                     continue
                 share_data = (
@@ -192,33 +215,75 @@ class ShareManager:
         safe_print(
             f"Task 5-A: Generated shared secret EncID: {binascii.hexlify(encID).decode()}"
         )
-        self.broadcast_encID(encID)
+        self.verify_encID(encID)
 
+    def verify_encID(self, received_encID):
+        """Verify the received EncID against the computed EncID"""
+        if self.computed_encID is None:
+            # EncID has already been processed and deleted
+            return
+
+        if self.computed_encID == received_encID:
+            safe_print(
+                f"Task 5-B: Successfully verified received EncID: {binascii.hexlify(received_encID).decode()}"
+            )
+            self.broadcast_encID(self.computed_encID)
+        else:
+            safe_print(
+                f"Task 5-B: Verification failed for received EncID: {binascii.hexlify(received_encID).decode()}"
+            )
+    
     def broadcast_encID(self, encID):
         """Broadcast the EncID to other nodes"""
         encID_data = binascii.hexlify(encID).decode()
         self.encid_verification_socket.sendto(
             encID_data.encode(), ("<broadcast>", 48000)
         )
-        safe_print(f"Task 5: Broadcasting EncID: {encID_data}")
+        safe_print(f"Broadcasting EncID: {encID_data}")
+        self.encode_and_delete_encID(self.computed_encID)
+
+    def encode_and_delete_encID(self, encID):
+        """Encode the EncID into the DBF and delete the EncID"""
+        if encID is None or self.computed_encID is None:
+            safe_print("Error: Attempted to encode None EncID or EncID already deleted")
+            return
+
+        safe_print("\n------------------> Segment 6 <------------------")
+        safe_print(f"Current DBF state before encoding:")
+        self.show_dbf_state()
+        
+        self.dbf.add(encID)
+        safe_print(f"Encoded EncID into DBF: {binascii.hexlify(encID).decode()}")
+        
+        safe_print(f"DBF state after encoding:")
+        self.show_dbf_state()
+        
+        safe_print(f"Deleting EncID from memory.")
+        self.computed_encID = None  # Delete the EncID from memory
+        
+        safe_print(f"Verifying EncID deletion:")
+        if self.computed_encID is None:
+            safe_print("EncID successfully deleted from memory.")
+        else:
+            safe_print("Error: EncID not deleted from memory.")
+
+    def show_dbf_state(self):
+        """Display the current state of the Bloom Filter"""
+        total_bits = len(self.dbf.bit_array)
+        set_bits = self.dbf.bit_array.count(1)
+        percentage_set = (set_bits / total_bits) * 100
+        
+        safe_print(f"DBF size: {total_bits} bits")
+        safe_print(f"Set bits: {set_bits}")
+        safe_print(f"Percentage of bits set: {percentage_set:.2f}%")
+        
 
     def listen_for_encID(self):
         """Listen for EncID broadcasts and verify"""
         while True:
             data, _ = self.encid_verification_socket.recvfrom(1024)
             received_encID = binascii.unhexlify(data.decode())
-            self.verify_encID(received_encID)
-
-    def verify_encID(self, received_encID):
-        """Verify the received EncID against the computed EncID"""
-        if self.computed_encID == received_encID:
-            safe_print(
-                f"Task 5-B: Successfully verified received EncID: {binascii.hexlify(received_encID).decode()}"
-            )
-        else:
-            safe_print(
-                f"Task 5-B: Verification failed for received EncID: {binascii.hexlify(received_encID).decode()}"
-            )
+            self.verify_encID(received_encID)                
 
     def start(self):
         threading.Thread(
