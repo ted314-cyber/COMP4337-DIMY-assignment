@@ -18,6 +18,7 @@ class BloomFilter:
         self.hash_count = hash_count
         self.bit_array = bitarray.bitarray(size)
         self.bit_array.setall(0)
+        self.dbf_start_time = time.time()
 
     def add(self, item):
         if isinstance(item, str):
@@ -105,6 +106,16 @@ class ShareManager:
         self.current_ephid = None
         self.current_shares = None
         self.dbf = BloomFilter()
+        self.dbf_list = []
+        self.dbf_start_time = time.time()
+        self.dbf_max_age = 30  # 30 seconds in seconds
+        self.dbf_interval = 5  # 5 seconds in seconds
+        self.qbf_interval = 15  # 15 seconds in seconds
+        # self.dbf_max_age = 540  # 9 minutes in seconds
+        # self.dbf_interval = 90  # 90 seconds in seconds
+        # self.qbf_interval = 540  # 9 minutes in seconds
+        self.last_qbf_time = time.time()
+        self.encoded_encID_set = set()
 
     def setup_server_socket(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -233,14 +244,21 @@ class ShareManager:
                 f"Task 5-B: Verification failed for received EncID: {binascii.hexlify(received_encID).decode()}"
             )
     
+    ############################## Task 6 ##############################
+    # Segment 6:A node, after successfully constructing the EncID, will encode EncID into a Bloom filter called Daily Bloom Filter (DBF), and delete the EncID.
     def broadcast_encID(self, encID):
         """Broadcast the EncID to other nodes"""
         encID_data = binascii.hexlify(encID).decode()
+        if encID in self.encoded_encID_set:
+            safe_print(f"Skipping broadcast for already encoded EncID: {encID_data}")
+            return
+
         self.encid_verification_socket.sendto(
             encID_data.encode(), ("<broadcast>", 48000)
         )
         safe_print(f"Broadcasting EncID: {encID_data}")
-        self.encode_and_delete_encID(self.computed_encID)
+        self.encode_and_delete_encID(encID)
+        self.encoded_encID_set.add(encID)
 
     def encode_and_delete_encID(self, encID):
         """Encode the EncID into the DBF and delete the EncID"""
@@ -266,6 +284,10 @@ class ShareManager:
             safe_print("EncID successfully deleted from memory.")
         else:
             safe_print("Error: EncID not deleted from memory.")
+        
+        # To prevent re-broadcasting the same EncID
+        self.encoded_encID_set.add(encID)
+
 
     def show_dbf_state(self):
         """Display the current state of the Bloom Filter"""
@@ -274,7 +296,7 @@ class ShareManager:
         percentage_set = (set_bits / total_bits) * 100
         
         safe_print(f"DBF size: {total_bits} bits")
-        safe_print(f"Set bits: {set_bits}")
+        safe_print(f"Set bits: {set_bits}") 
         safe_print(f"Percentage of bits set: {percentage_set:.2f}%")
         
 
@@ -283,7 +305,49 @@ class ShareManager:
         while True:
             data, _ = self.encid_verification_socket.recvfrom(1024)
             received_encID = binascii.unhexlify(data.decode())
-            self.verify_encID(received_encID)                
+            self.verify_encID(received_encID)     
+
+    ############################## Task 7 ##############################
+    # Segment 7-A:Show that the nodes are encoding multiple EncIDs into the same DBF and show the state of the DBF after each addition.
+    # Segment 7-B:Show that a new DBF gets created for the nodes after every 90 seconds. A node can only store maximum of 6 DBFs.
+    def manage_dbf_sampling(self):
+        """Periodically sample and reset the DBF, and merge older DBFs when necessary."""
+        while True:
+            current_time = time.time()
+
+            # Task 7-A: Check if a new DBF needs to be created
+            if current_time - self.dbf_start_time >= self.dbf_interval:
+                self.dbf_list.append(self.dbf)
+                self.dbf = BloomFilter()  # 新建的 BloomFilter 已包含 dbf_start_time 属性
+                self.dbf_start_time = current_time
+                safe_print("\n------------------> Segment 7-A <------------------")
+                safe_print("Task 7-A: New DBF created and added to DBF list.")
+                safe_print(f"Current number of DBFs: {len(self.dbf_list)}")
+
+            # Task 7-B: Remove DBFs older than dbf_max_age
+            original_dbf_count = len(self.dbf_list)
+            self.dbf_list = [dbf for dbf in self.dbf_list if current_time - dbf.dbf_start_time <= self.dbf_max_age]
+            removed_dbf_count = original_dbf_count - len(self.dbf_list)
+
+            if removed_dbf_count > 0:
+                safe_print("\n------------------> Segment 7-B <------------------")
+                safe_print(f"Task 7-B: Removed {removed_dbf_count} DBFs older than {self.dbf_max_age} seconds.")
+                safe_print(f"Remaining DBFs: {len(self.dbf_list)}")
+
+            ############################## Task 8 ##############################
+            # Segment 8:Show that after every 9 minutes, the nodes combine all the available DBFs into a single QBF.
+            if current_time - self.last_qbf_time >= self.qbf_interval:
+                qbf = BloomFilter()
+                for dbf in self.dbf_list:
+                    qbf.bit_array |= dbf.bit_array
+
+                safe_print("\n------------------> Segment 8 <------------------")
+                safe_print(f"Task 8: Combined DBFs into QBF with {qbf.bit_array.count()} set bits.")
+
+                self.last_qbf_time = current_time  # Reset start time after upload
+
+            time.sleep(1) 
+
 
     def start(self):
         threading.Thread(
@@ -294,6 +358,9 @@ class ShareManager:
         ).start()
         threading.Thread(
             target=self.listen_for_encID, name="EncIDListenThread", daemon=True
+        ).start()
+        threading.Thread(
+            target=self.manage_dbf_sampling, name="DBFSamplingThread", daemon=True
         ).start()
 
 def main():
