@@ -108,12 +108,9 @@ class ShareManager:
         self.dbf = BloomFilter()
         self.dbf_list = []
         self.dbf_start_time = time.time()
-        self.dbf_max_age = 30  # 30 seconds in seconds
-        self.dbf_interval = 5  # 5 seconds in seconds
-        self.qbf_interval = 15  # 15 seconds in seconds
-        # self.dbf_max_age = 540  # 9 minutes in seconds
-        # self.dbf_interval = 90  # 90 seconds in seconds
-        # self.qbf_interval = 540  # 9 minutes in seconds
+        self.dbf_max_age = 540  # 9 minutes in seconds
+        self.dbf_interval = 90  # 90 seconds in seconds
+        self.qbf_interval = 540  # 9 minutes in seconds
         self.last_qbf_time = time.time()
         self.encoded_encID_set = set()
 
@@ -318,7 +315,7 @@ class ShareManager:
             # Task 7-A: Check if a new DBF needs to be created
             if current_time - self.dbf_start_time >= self.dbf_interval:
                 self.dbf_list.append(self.dbf)
-                self.dbf = BloomFilter()  # 新建的 BloomFilter 已包含 dbf_start_time 属性
+                self.dbf = BloomFilter() 
                 self.dbf_start_time = current_time
                 safe_print("\n------------------> Segment 7-A <------------------")
                 safe_print("Task 7-A: New DBF created and added to DBF list.")
