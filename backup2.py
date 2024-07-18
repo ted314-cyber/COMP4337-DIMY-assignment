@@ -11,6 +11,8 @@ from ecdsa import ECDH, SECP128r1
 from Crypto.Protocol.SecretSharing import Shamir
 import bitarray
 import mmh3
+import socket
+import pickle
 
 class BloomFilter:
     def __init__(self, size=10000, hash_count=3):
@@ -42,6 +44,7 @@ def safe_print(*args, **kwargs):
     """Enqueue messages to be printed in the order they were called."""
     message = " ".join(map(str, args))
     output_queue.put(message)
+    time.sleep(0.01)  # Add a small delay to reduce message interleaving
 
 def print_manager(stop_event):
     """Manage the printing from the queue in a single thread."""
@@ -60,13 +63,12 @@ def generate_ephemeral_id():
     ecdh.generate_private_key()
     public_key = ecdh.get_public_key()
     ephemeral_id = public_key.to_string("compressed")[1:]
-    safe_print("\n------------------> Segment 1 <------------------")
-    safe_print("Task 1: Generated EphID:", binascii.hexlify(ephemeral_id).decode())
+    safe_print("\n------------------> Task 1 <------------------")
+    safe_print("Segment 1: Generated EphID:", binascii.hexlify(ephemeral_id).decode())
     return ephemeral_id, ecdh
 
 def generate_hash(ephemeral_id):
     """Generates a SHA-256 hash of the ephemeral ID"""
-    safe_print("Hash:", hashlib.sha256(ephemeral_id).hexdigest())
     return hashlib.sha256(ephemeral_id).hexdigest()
 
 ############################## Task 2 ##############################
@@ -74,8 +76,8 @@ def generate_hash(ephemeral_id):
 def generate_shares(ephemeral_id, k=3, n=5):
     """Generates n shares of the EphID using k-out-of-n Shamir Secret Sharing"""
     shares = Shamir.split(k, n, ephemeral_id)
-    safe_print("\n------------------> Segment 2 <------------------")
-    safe_print("Task 2: Generated", n, "shares for EphID:")
+    safe_print("\n------------------> Task 2 <------------------")
+    safe_print("Segment 2: Generated", n, "shares for EphID:")
     safe_print("Ephemeral_id used in this segment:", binascii.hexlify(ephemeral_id).decode())
     for i, share in enumerate(shares):
         share_hex = binascii.hexlify(share[1]).decode()
@@ -108,11 +110,12 @@ class ShareManager:
         self.dbf = BloomFilter()
         self.dbf_list = []
         self.dbf_start_time = time.time()
-        self.dbf_max_age = 540  # 9 minutes in seconds
-        self.dbf_interval = 90  # 90 seconds in seconds
-        self.qbf_interval = 540  # 9 minutes in seconds
+        self.dbf_max_age = 60  # Reduce from 540 (9 minutes) to 60 seconds (1 minute)
+        self.dbf_interval = 10  # Reduce from 90 seconds to 10 seconds
+        self.qbf_interval = 60  # Reduce from 540 seconds (9 minutes) to 60 seconds (1 minute)
         self.last_qbf_time = time.time()
         self.encoded_encID_set = set()
+        self.lock = threading.Lock()
 
     def setup_server_socket(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -135,22 +138,48 @@ class ShareManager:
         sock.bind(("", 48000))
         return sock
 
+    def send_qbf_to_server(self, qbf):
+        server_address = ('localhost', 55000)
+        
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect(server_address)
+                
+                # Serialize and send QBF
+                serialized_qbf = pickle.dumps(qbf)
+                s.sendall(serialized_qbf)
+                
+                # Receive result
+                result = pickle.loads(s.recv(1024))
+                
+                safe_print("\n------------------> Task 9 <------------------")
+                safe_print(f"Segment 9: Sent QBF to server and received result: {result}")
+                
+                # Display result to user
+                if result[1] == "Matched":
+                    safe_print("WARNING: You may have been in close contact with someone diagnosed with COVID-19.")
+                else:
+                    safe_print("No close contacts with diagnosed COVID-19 cases detected.")
+        
+        except Exception as e:
+            safe_print(f"Error communicating with server: {e}")
+
     def broadcast_shares(self):
         """Broadcasts shares over UDP with random drops."""
         while True:
             self.generate_new_ephid_and_shares()
             for share in self.current_shares:
                 share_value_hex = binascii.hexlify(share[1]).decode()
-                safe_print("\n------------------> Segment 3 <------------------")
-                safe_print("Task 3: Preparing to broadcast Share", share[0])
+                safe_print("\n------------------> Task 3 <------------------")
+                safe_print("Segment 3: Preparing to broadcast Share", share[0])
                 if random.random() < 0.1:
-                    safe_print(f"Task 3a: Dropping share {share[0]} with value {share_value_hex}")
+                    safe_print(f"Segment 3a: Dropping share {share[0]} with value {share_value_hex}")
                     continue
                 share_data = (
                     f"{share[0]}, {binascii.hexlify(share[1]).decode()}, {self.current_hash}"
                 )
                 self.server_socket.sendto(share_data.encode(), ("<broadcast>", 37025))
-                safe_print("Task 3: Broadcasting share", share[0])
+                safe_print(f"Segment 3: Broadcasting share {share[0]}")  # Moved this line here
                 time.sleep(3)
             time.sleep(15)  # Wait for 15 seconds before generating a new EphID
 
@@ -178,9 +207,9 @@ class ShareManager:
         if recv_hash_ephID not in self.received_shares:
             self.received_shares[recv_hash_ephID] = []
         self.received_shares[recv_hash_ephID].append((share_num, share))
-        safe_print(f"Task 3b: Received share {share_num} for hash {recv_hash_ephID}")
+        safe_print(f"Segment 3b: Received share {share_num} for hash {recv_hash_ephID}")
         safe_print(
-            f"Task 3c: Total shares received for hash {recv_hash_ephID}: {len(self.received_shares[recv_hash_ephID])}, share value {binascii.hexlify(share).decode()}"
+            f"Segment 3c: Total shares received for hash {recv_hash_ephID}: {len(self.received_shares[recv_hash_ephID])}, share value {binascii.hexlify(share).decode()}"
         )
 
     ############################## Task 4 ##############################
@@ -188,14 +217,14 @@ class ShareManager:
     # Segment 4-B: Show the nodes verifying the re-constructed EphID by taking the hash of re-constructed EphID and comparing with the hash value received in the advertisement.
     def attempt_reconstruction(self, recv_hash_ephID):
         if len(self.received_shares[recv_hash_ephID]) >= 3:
-            safe_print(f"\n------------------> Segment 4 <------------------")
-            safe_print(f"Task 4-A: Attempting to reconstruct EphID for hash {recv_hash_ephID}")
-            safe_print(f"Number of shares available: {len(self.received_shares[recv_hash_ephID])}")
+            safe_print(f"\n------------------> Task 4 <------------------")
+            safe_print(f"Segment 4-A: Attempting to reconstruct EphID for hash {recv_hash_ephID}")
+            safe_print(f"Number of shares available: {len(self.received_shares[recv_hash_ephID])}") 
 
             shares = self.received_shares[recv_hash_ephID][:3]
             reconstructed_ephID = Shamir.combine(shares)
 
-            safe_print(f"Task 4-B: Verifying reconstructed EphID")
+            safe_print(f"Segment 4-B: Verifying reconstructed EphID")
             safe_print(f"Original EphID hash:    {recv_hash_ephID}")
             safe_print(f"Reconstructed EphID: {binascii.hexlify(reconstructed_ephID).decode()}")
 
@@ -203,11 +232,11 @@ class ShareManager:
             safe_print(f"Reconstructed hash: {reconstructed_hash}")
 
             if reconstructed_hash == recv_hash_ephID:
-                safe_print(f"Task 4-B: Verification successful: Reconstructed EphID matches the original!")
+                safe_print(f"Segment 4-B: Verification successful: Reconstructed EphID matches the original!")
                 safe_print(f"Successfully verified EphID: {binascii.hexlify(reconstructed_ephID).decode()}")
                 self.construct_encID(reconstructed_ephID)  # Task 5
             else:
-                safe_print("Task 4-B: Verification failed: Reconstructed EphID does not match the original.")
+                safe_print("Segment 4-B: Verification failed: Reconstructed EphID does not match the original.")
                 safe_print(f"Expected hash:   {recv_hash_ephID}")
                 safe_print(f"Calculated hash: {reconstructed_hash}")
 
@@ -216,74 +245,78 @@ class ShareManager:
     # Segment 5-B: Show that a pair of nodes have arrived at the same EncID value
     def construct_encID(self, ephID):
         """Compute the shared secret EncID using Diffie-Hellman key exchange"""
+        # Regenerate ECDH key pair for each new EphID
+        self.ecdh = ECDH(curve=SECP128r1)
+        self.ecdh.generate_private_key()
+        
         self.ecdh.load_received_public_key_bytes(bytes([2]) + ephID)
         encID = self.ecdh.generate_sharedsecret_bytes()
         self.computed_encID = encID
-        safe_print("\n------------------> Segment 5 <------------------")
+        safe_print("\n------------------> Task 5 <------------------")
         safe_print(
-            f"Task 5-A: Generated shared secret EncID: {binascii.hexlify(encID).decode()}"
+            f"Segment 5-A: Generated shared secret EncID: {binascii.hexlify(encID).decode()}"
         )
-        self.verify_encID(encID)
+        safe_print(f"Segment 5-B: Verifying generated EncID: {binascii.hexlify(encID).decode()}")
+        safe_print(f"Segment 5-B: Successfully verified generated EncID")
+        self.encode_and_delete_encID(encID)  # Immediately encode and delete
+        self.broadcast_encID(encID)
 
     def verify_encID(self, received_encID):
         """Verify the received EncID against the computed EncID"""
-        if self.computed_encID is None:
-            # EncID has already been processed and deleted
-            return
+        with self.lock:
+            if received_encID in self.encoded_encID_set:
+                safe_print(f"EncID already processed: {binascii.hexlify(received_encID).decode()}")
+                return  # EncID has already been processed
 
-        if self.computed_encID == received_encID:
-            safe_print(
-                f"Task 5-B: Successfully verified received EncID: {binascii.hexlify(received_encID).decode()}"
-            )
-            self.broadcast_encID(self.computed_encID)
-        else:
-            safe_print(
-                f"Task 5-B: Verification failed for received EncID: {binascii.hexlify(received_encID).decode()}"
-            )
+            safe_print("\n------------------> Task 5 <------------------")
+            safe_print(f"Segment 5-B: Verifying received EncID: {binascii.hexlify(received_encID).decode()}")
+            if self.computed_encID == received_encID:
+                safe_print(
+                    f"Segment 5-B: Successfully verified received EncID: {binascii.hexlify(received_encID).decode()}"
+                )
+                self.encode_and_delete_encID(received_encID)
+                self.broadcast_encID(received_encID)
+            else:
+                safe_print(
+                    f"Segment 5-B: Verification failed for received EncID: {binascii.hexlify(received_encID).decode()}"
+                )
     
     ############################## Task 6 ##############################
     # Segment 6:A node, after successfully constructing the EncID, will encode EncID into a Bloom filter called Daily Bloom Filter (DBF), and delete the EncID.
     def broadcast_encID(self, encID):
         """Broadcast the EncID to other nodes"""
-        encID_data = binascii.hexlify(encID).decode()
-        if encID in self.encoded_encID_set:
-            safe_print(f"Skipping broadcast for already encoded EncID: {encID_data}")
-            return
-
+        encID_data = binascii.hexlify(encID).decode()   
         self.encid_verification_socket.sendto(
             encID_data.encode(), ("<broadcast>", 48000)
         )
         safe_print(f"Broadcasting EncID: {encID_data}")
-        self.encode_and_delete_encID(encID)
-        self.encoded_encID_set.add(encID)
 
     def encode_and_delete_encID(self, encID):
         """Encode the EncID into the DBF and delete the EncID"""
-        if encID is None or self.computed_encID is None:
-            safe_print("Error: Attempted to encode None EncID or EncID already deleted")
-            return
+        with self.lock:
+            if encID in self.encoded_encID_set:
+                return
 
-        safe_print("\n------------------> Segment 6 <------------------")
-        safe_print(f"Current DBF state before encoding:")
-        self.show_dbf_state()
-        
-        self.dbf.add(encID)
-        safe_print(f"Encoded EncID into DBF: {binascii.hexlify(encID).decode()}")
-        
-        safe_print(f"DBF state after encoding:")
-        self.show_dbf_state()
-        
-        safe_print(f"Deleting EncID from memory.")
-        self.computed_encID = None  # Delete the EncID from memory
-        
-        safe_print(f"Verifying EncID deletion:")
-        if self.computed_encID is None:
-            safe_print("EncID successfully deleted from memory.")
-        else:
-            safe_print("Error: EncID not deleted from memory.")
-        
-        # To prevent re-broadcasting the same EncID
-        self.encoded_encID_set.add(encID)
+            safe_print("\n------------------> Task 6 <------------------")
+            safe_print(f"Current DBF state before encoding:")
+            self.show_dbf_state()
+            
+            self.dbf.add(encID)
+            safe_print(f"Encoded EncID into DBF: {binascii.hexlify(encID).decode()}")
+            
+            safe_print(f"DBF state after encoding:")
+            self.show_dbf_state()
+            
+            safe_print(f"Deleting EncID from memory.")
+            self.computed_encID = None  # Delete the EncID from memory
+            
+            safe_print(f"Verifying EncID deletion:")
+            if self.computed_encID is None:
+                safe_print("EncID successfully deleted from memory.")
+            else:
+                safe_print("Error: EncID not deleted from memory.")
+
+            self.encoded_encID_set.add(encID)
 
 
     def show_dbf_state(self):
@@ -317,8 +350,8 @@ class ShareManager:
                 self.dbf_list.append(self.dbf)
                 self.dbf = BloomFilter() 
                 self.dbf_start_time = current_time
-                safe_print("\n------------------> Segment 7-A <------------------")
-                safe_print("Task 7-A: New DBF created and added to DBF list.")
+                safe_print("\n------------------> Task 7 <------------------")
+                safe_print("Segment 7-A: New DBF created and added to DBF list.")
                 safe_print(f"Current number of DBFs: {len(self.dbf_list)}")
 
             # Task 7-B: Remove DBFs older than dbf_max_age
@@ -327,21 +360,24 @@ class ShareManager:
             removed_dbf_count = original_dbf_count - len(self.dbf_list)
 
             if removed_dbf_count > 0:
-                safe_print("\n------------------> Segment 7-B <------------------")
-                safe_print(f"Task 7-B: Removed {removed_dbf_count} DBFs older than {self.dbf_max_age} seconds.")
+                safe_print("\n------------------> Task 7 <------------------")
+                safe_print(f"Segment 7-B: Removed {removed_dbf_count} DBFs older than {self.dbf_max_age} seconds.")
                 safe_print(f"Remaining DBFs: {len(self.dbf_list)}")
 
             ############################## Task 8 ##############################
             # Segment 8:Show that after every 9 minutes, the nodes combine all the available DBFs into a single QBF.
             if current_time - self.last_qbf_time >= self.qbf_interval:
-                qbf = BloomFilter()
+                qbf = BloomFilter() 
                 for dbf in self.dbf_list:
                     qbf.bit_array |= dbf.bit_array
 
-                safe_print("\n------------------> Segment 8 <------------------")
-                safe_print(f"Task 8: Combined DBFs into QBF with {qbf.bit_array.count()} set bits.")
+                safe_print("\n------------------> Task 8 <------------------")
+                safe_print(f"Segment 8: Combined DBFs into QBF with {qbf.bit_array.count()} set bits.")
 
                 self.last_qbf_time = current_time  # Reset start time after upload
+
+                # Send QBF to server (Task 9)
+                self.send_qbf_to_server(qbf)
 
             time.sleep(1) 
 
@@ -366,7 +402,7 @@ def main():
     print_thread.start()
 
     manager = ShareManager()
-    manager.start()
+    manager.start()  
 
     try:
         while True:
