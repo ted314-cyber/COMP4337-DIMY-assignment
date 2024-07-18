@@ -1,58 +1,55 @@
-------------------> Segment 1 <------------------
-Task 1: Generated EphID: d9735416ae4455355f5d9cd2e64d608b
+------------------> Task 1 <------------------
+Segment 1: Generated EphID: e432a9749aa40371a66672f32093a358
 
-------------------> Segment 2 <------------------
-Task 2: Generated 5 shares for EphID:
-Ephemeral_id used in this segment: d9735416ae4455355f5d9cd2e64d608b
-  Share 1 : (1, be65f087d8cc047ecf5d2133af9684d0)
-  Share 2 : (2, e7d051dccf45fc6e80e17572c4d290ab)
-  Share 3 : (3, 80c6f54db9cdad2510e1c8938d0974f0)
-  Share 4 : (4, 660c6c205c0328b11ed2061867d2631a)
-  Share 5 : (5, 011ac8b12a8b79fa8ed2bbf92e098741)
-Hash: 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
+------------------> Task 2 <------------------
+Segment 2: Generated 5 shares for EphID:
+Ephemeral_id used in this segment: e432a9749aa40371a66672f32093a358
+  Share 1 : (1, d0e6d73933ab4dbf4bfa853b6d3d2a82)
+  Share 2 : (2, b46c16a661b9e9b3366fc5dd58884e0e)
+  Share 3 : (3, 80b868ebc8b6a77ddbf332151526c7d4)
+  Share 4 : (4, a356dbf7c8920b89aab47e545dbf827c)
+  Share 5 : (5, 9782a5ba619d45474728899c10110ba6)
+Hash: 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
 
-------------------> Segment 3 <------------------
-Task 3: Preparing to broadcast Share 1
-Task 3b: Received share 1 for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Task 3c: Total shares received for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a: 1, share value be65f087d8cc047ecf5d2133af9684d0
-Task 3: Broadcasting share 1
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 1
+Segment 3: Broadcasting share 1
+Segment 3b: Received share 1 for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Segment 3c: Total shares received for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c: 1, share value d0e6d73933ab4dbf4bfa853b6d3d2a82
 
-------------------> Segment 3 <------------------
-Task 3: Preparing to broadcast Share 2
-Task 3: Broadcasting share 2
-Task 3b: Received share 2 for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Task 3c: Total shares received for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a: 2, share value e7d051dccf45fc6e80e17572c4d290ab
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 2
+Segment 3: Broadcasting share 2
+Segment 3b: Received share 2 for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Segment 3c: Total shares received for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c: 2, share value b46c16a661b9e9b3366fc5dd58884e0e
 
-------------------> Segment 3 <------------------
-Task 3: Preparing to broadcast Share 3
-Task 3: Broadcasting share 3
-Task 3b: Received share 3 for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Task 3c: Total shares received for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a: 3, share value 80c6f54db9cdad2510e1c8938d0974f0
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 3
+Segment 3: Broadcasting share 3
+Segment 3b: Received share 3 for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Segment 3c: Total shares received for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c: 3, share value 80b868ebc8b6a77ddbf332151526c7d4
 
-------------------> Segment 4 <------------------
-Task 4-A: Attempting to reconstruct EphID for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
+------------------> Task 4 <------------------
+Segment 4-A: Attempting to reconstruct EphID for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
 Number of shares available: 3
-Task 4-B: Verifying reconstructed EphID
-Original EphID hash:    984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Reconstructed EphID: d9735416ae4455355f5d9cd2e64d608b
-Hash: 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Reconstructed hash: 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Task 4-B: Verification successful: Reconstructed EphID matches the original!
-Successfully verified EphID: d9735416ae4455355f5d9cd2e64d608b
+Segment 4-B: Verifying reconstructed EphID
+Original EphID hash:    7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Reconstructed EphID: e432a9749aa40371a66672f32093a358
+Hash: 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Segment 4-B: Verification successful: Reconstructed EphID matches the original!
+Successfully verified EphID: e432a9749aa40371a66672f32093a358
 
-------------------> Segment 5 <------------------
-Task 5-A: Generated shared secret EncID: 102ab57ae670e9114cfa8e96118a64e7
+------------------> Task 5 <------------------
+Segment 5-A: Generated shared secret EncID: 7d003967665a4ad4f62085454d104cea
+Segment 5-B: Verifying generated EncID: 7d003967665a4ad4f62085454d104cea
+Segment 5-B: Successfully verified generated EncID
 
-------------------> Segment 5 <------------------
-Task 5-B: Successfully verified received EncID: 102ab57ae670e9114cfa8e96118a64e7
-Task 5-C: Broadcasting EncID: 102ab57ae670e9114cfa8e96118a64e7
-
-------------------> Segment 6 <------------------
+------------------> Task 6 <------------------
 Current DBF state before encoding:
 DBF size: 10000 bits
 Set bits: 0
 Percentage of bits set: 0.00%
-Encoded EncID into DBF: 102ab57ae670e9114cfa8e96118a64e7
+Encoded EncID into DBF: 7d003967665a4ad4f62085454d104cea
 DBF state after encoding:
 DBF size: 10000 bits
 Set bits: 3
@@ -60,75 +57,77 @@ Percentage of bits set: 0.03%
 Deleting EncID from memory.
 Verifying EncID deletion:
 EncID successfully deleted from memory.
+Broadcasting EncID: 7d003967665a4ad4f62085454d104cea
+EncID already processed: 7d003967665a4ad4f62085454d104cea
 
-------------------> Segment 3 <------------------
-Task 3: Preparing to broadcast Share 4
-Task 3: Broadcasting share 4
-Task 3b: Received share 4 for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Task 3c: Total shares received for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a: 4, share value 660c6c205c0328b11ed2061867d2631a
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 4
+Segment 3: Broadcasting share 4
+Segment 3b: Received share 4 for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Segment 3c: Total shares received for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c: 4, share value a356dbf7c8920b89aab47e545dbf827c
 
-------------------> Segment 4 <------------------
-Task 4-A: Attempting to reconstruct EphID for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
+------------------> Task 4 <------------------
+Segment 4-A: Attempting to reconstruct EphID for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
 Number of shares available: 4
-Task 4-B: Verifying reconstructed EphID
-Original EphID hash:    984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Reconstructed EphID: d9735416ae4455355f5d9cd2e64d608b
-Hash: 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Reconstructed hash: 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Task 4-B: Verification successful: Reconstructed EphID matches the original!
-Successfully verified EphID: d9735416ae4455355f5d9cd2e64d608b
+Segment 4-B: Verifying reconstructed EphID
+Original EphID hash:    7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Reconstructed EphID: e432a9749aa40371a66672f32093a358
+Hash: 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Segment 4-B: Verification successful: Reconstructed EphID matches the original!
+Successfully verified EphID: e432a9749aa40371a66672f32093a358
 
-------------------> Segment 5 <------------------
-Task 5-A: Generated shared secret EncID: 102ab57ae670e9114cfa8e96118a64e7
+------------------> Task 5 <------------------
+Segment 5-A: Generated shared secret EncID: 87601c6ba8416db55f573688a8cb151f
+Segment 5-B: Verifying generated EncID: 87601c6ba8416db55f573688a8cb151f
+Segment 5-B: Successfully verified generated EncID
 
-------------------> Segment 5 <------------------
-Task 5-B: Successfully verified received EncID: 102ab57ae670e9114cfa8e96118a64e7
-Task 5-C: Broadcasting EncID: 102ab57ae670e9114cfa8e96118a64e7
-
-------------------> Segment 6 <------------------
+------------------> Task 6 <------------------
 Current DBF state before encoding:
 DBF size: 10000 bits
 Set bits: 3
 Percentage of bits set: 0.03%
-Encoded EncID into DBF: 102ab57ae670e9114cfa8e96118a64e7
+Encoded EncID into DBF: 87601c6ba8416db55f573688a8cb151f
 DBF state after encoding:
 DBF size: 10000 bits
-Set bits: 3
-Percentage of bits set: 0.03%
+Set bits: 6
+Percentage of bits set: 0.06%
 Deleting EncID from memory.
 Verifying EncID deletion:
 EncID successfully deleted from memory.
+Broadcasting EncID: 87601c6ba8416db55f573688a8cb151f
+EncID already processed: 87601c6ba8416db55f573688a8cb151f
 
-------------------> Segment 3 <------------------
-Task 3: Preparing to broadcast Share 5
-Task 3: Broadcasting share 5
-Task 3b: Received share 5 for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Task 3c: Total shares received for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a: 5, share value 011ac8b12a8b79fa8ed2bbf92e098741
+------------------> Task 7 <------------------
+Segment 7-A: New DBF created and added to DBF list.
+Current number of DBFs: 1
 
-------------------> Segment 4 <------------------
-Task 4-A: Attempting to reconstruct EphID for hash 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 5
+Segment 3: Broadcasting share 5
+Segment 3b: Received share 5 for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Segment 3c: Total shares received for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c: 5, share value 9782a5ba619d45474728899c10110ba6
+
+------------------> Task 4 <------------------
+Segment 4-A: Attempting to reconstruct EphID for hash 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
 Number of shares available: 5
-Task 4-B: Verifying reconstructed EphID
-Original EphID hash:    984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Reconstructed EphID: d9735416ae4455355f5d9cd2e64d608b
-Hash: 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Reconstructed hash: 984d0266a4706e10f8f559b11d7c3a10be28b18a1658db94d61c651178cca88a
-Task 4-B: Verification successful: Reconstructed EphID matches the original!
-Successfully verified EphID: d9735416ae4455355f5d9cd2e64d608b
+Segment 4-B: Verifying reconstructed EphID
+Original EphID hash:    7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Reconstructed EphID: e432a9749aa40371a66672f32093a358
+Hash: 7f5c2f5eaba46d2d78ef2f51e44055dba5d744b39b717b87427166f0001b532c
+Segment 4-B: Verification successful: Reconstructed EphID matches the original!
+Successfully verified EphID: e432a9749aa40371a66672f32093a358
 
-------------------> Segment 5 <------------------
-Task 5-A: Generated shared secret EncID: 102ab57ae670e9114cfa8e96118a64e7
+------------------> Task 5 <------------------
+Segment 5-A: Generated shared secret EncID: 64081b57220d15eacd1db264b1947ed4
+Segment 5-B: Verifying generated EncID: 64081b57220d15eacd1db264b1947ed4
+Segment 5-B: Successfully verified generated EncID
 
-------------------> Segment 5 <------------------
-Task 5-B: Successfully verified received EncID: 102ab57ae670e9114cfa8e96118a64e7
-Task 5-C: Broadcasting EncID: 102ab57ae670e9114cfa8e96118a64e7
-
-------------------> Segment 6 <------------------
+------------------> Task 6 <------------------
 Current DBF state before encoding:
 DBF size: 10000 bits
-Set bits: 3
-Percentage of bits set: 0.03%
-Encoded EncID into DBF: 102ab57ae670e9114cfa8e96118a64e7
+Set bits: 0
+Percentage of bits set: 0.00%
+Encoded EncID into DBF: 64081b57220d15eacd1db264b1947ed4
 DBF state after encoding:
 DBF size: 10000 bits
 Set bits: 3
@@ -136,29 +135,158 @@ Percentage of bits set: 0.03%
 Deleting EncID from memory.
 Verifying EncID deletion:
 EncID successfully deleted from memory.
+Broadcasting EncID: 64081b57220d15eacd1db264b1947ed4
+EncID already processed: 64081b57220d15eacd1db264b1947ed4
 
-------------------> Segment 1 <------------------
-Task 1: Generated EphID: 9303e803c7689f0a8d0db26fe9b5b347
+------------------> Task 7 <------------------
+Segment 7-A: New DBF created and added to DBF list.
+Current number of DBFs: 2
 
-------------------> Segment 2 <------------------
-Task 2: Generated 5 shares for EphID:
-Ephemeral_id used in this segment: 9303e803c7689f0a8d0db26fe9b5b347
-  Share 1 : (1, 4ee438c048586c892d6d4ef61e8bec51)
-  Share 2 : (2, 04e7809607f1cfa52591d55c54a3b727)
-  Share 3 : (3, d900505588c13c2685f129c5a39de831)
-  Share 4 : (4, 0c641d633db8e0f67d430409de33502c)
-  Share 5 : (5, d183cda0b2881375dd23f890290d0f3a)
-Hash: fc2b6a05e170f152c7c0f00a3d7e90eaf63ac2bb6fa02fb6642259a7d2f745ed
+------------------> Task 7 <------------------
+Segment 7-A: New DBF created and added to DBF list.
+Current number of DBFs: 3
 
-------------------> Segment 3 <------------------
-Task 3: Preparing to broadcast Share 1
-Task 3: Broadcasting share 1
-Task 3b: Received share 1 for hash fc2b6a05e170f152c7c0f00a3d7e90eaf63ac2bb6fa02fb6642259a7d2f745ed
-Task 3c: Total shares received for hash fc2b6a05e170f152c7c0f00a3d7e90eaf63ac2bb6fa02fb6642259a7d2f745ed: 1, share value 4ee438c048586c892d6d4ef61e8bec51
+------------------> Task 1 <------------------
+Segment 1: Generated EphID: 29ecd8fc074230f5599be85b15bb9f97
 
-------------------> Segment 3 <------------------
-Task 3: Preparing to broadcast Share 2
-Task 3: Broadcasting share 2
-Task 3b: Received share 2 for hash fc2b6a05e170f152c7c0f00a3d7e90eaf63ac2bb6fa02fb6642259a7d2f745ed
-Task 3c: Total shares received for hash fc2b6a05e170f152c7c0f00a3d7e90eaf63ac2bb6fa02fb6642259a7d2f745ed: 2, share value 04e7809607f1cfa52591d55c54a3b727
-^CSTOP
+------------------> Task 2 <------------------
+Segment 2: Generated 5 shares for EphID:
+Ephemeral_id used in this segment: 29ecd8fc074230f5599be85b15bb9f97
+  Share 1 : (1, 497a9e60a0a8cf33c15bf5746444182b)
+  Share 2 : (2, dd05f2f9045d6f1e92afb0cfcbe5deb7)
+  Share 3 : (3, bd93b465a3b790d80a6fade0ba1a590b)
+  Share 4 : (4, 1728100732560eb92522d25a5f822430)
+  Share 5 : (5, 77be569b95bcf17fbde2cf752e7da38c)
+Hash: efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 1
+Segment 3: Broadcasting share 1
+Segment 3b: Received share 1 for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Segment 3c: Total shares received for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949: 1, share value 497a9e60a0a8cf33c15bf5746444182b
+
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 2
+Segment 3: Broadcasting share 2
+Segment 3b: Received share 2 for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Segment 3c: Total shares received for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949: 2, share value dd05f2f9045d6f1e92afb0cfcbe5deb7
+
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 3
+Segment 3a: Dropping share 3 with value bd93b465a3b790d80a6fade0ba1a590b
+
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 4
+Segment 3: Broadcasting share 4
+Segment 3b: Received share 4 for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Segment 3c: Total shares received for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949: 3, share value 1728100732560eb92522d25a5f822430
+
+------------------> Task 4 <------------------
+Segment 4-A: Attempting to reconstruct EphID for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Number of shares available: 3
+Segment 4-B: Verifying reconstructed EphID
+Original EphID hash:    efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Reconstructed EphID: 29ecd8fc074230f5599be85b15bb9f97
+Hash: efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Segment 4-B: Verification successful: Reconstructed EphID matches the original!
+Successfully verified EphID: 29ecd8fc074230f5599be85b15bb9f97
+
+------------------> Task 5 <------------------
+Segment 5-A: Generated shared secret EncID: 6e443de768ce82d55524d1031bafa73e
+Segment 5-B: Verifying generated EncID: 6e443de768ce82d55524d1031bafa73e
+Segment 5-B: Successfully verified generated EncID
+
+------------------> Task 6 <------------------
+Current DBF state before encoding:
+DBF size: 10000 bits
+Set bits: 0
+Percentage of bits set: 0.00%
+Encoded EncID into DBF: 6e443de768ce82d55524d1031bafa73e
+DBF state after encoding:
+DBF size: 10000 bits
+Set bits: 3
+Percentage of bits set: 0.03%
+Deleting EncID from memory.
+Verifying EncID deletion:
+EncID successfully deleted from memory.
+Broadcasting EncID: 6e443de768ce82d55524d1031bafa73e
+EncID already processed: 6e443de768ce82d55524d1031bafa73e
+
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 5
+Segment 3: Broadcasting share 5
+Segment 3b: Received share 5 for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Segment 3c: Total shares received for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949: 4, share value 77be569b95bcf17fbde2cf752e7da38c
+
+------------------> Task 4 <------------------
+Segment 4-A: Attempting to reconstruct EphID for hash efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Number of shares available: 4
+Segment 4-B: Verifying reconstructed EphID
+Original EphID hash:    efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Reconstructed EphID: 29ecd8fc074230f5599be85b15bb9f97
+Hash: efc881175a9d1566066eb3f10d47241d5be5f1aed1fb8ea218bb6267175ec949
+Segment 4-B: Verification successful: Reconstructed EphID matches the original!
+Successfully verified EphID: 29ecd8fc074230f5599be85b15bb9f97
+
+------------------> Task 5 <------------------
+Segment 5-A: Generated shared secret EncID: 91c9e94bf695b1b0d4716c6e5f5a3ca1
+Segment 5-B: Verifying generated EncID: 91c9e94bf695b1b0d4716c6e5f5a3ca1
+Segment 5-B: Successfully verified generated EncID
+
+------------------> Task 6 <------------------
+Current DBF state before encoding:
+DBF size: 10000 bits
+Set bits: 3
+Percentage of bits set: 0.03%
+Encoded EncID into DBF: 91c9e94bf695b1b0d4716c6e5f5a3ca1
+DBF state after encoding:
+DBF size: 10000 bits
+Set bits: 6
+Percentage of bits set: 0.06%
+Deleting EncID from memory.
+Verifying EncID deletion:
+EncID successfully deleted from memory.
+Broadcasting EncID: 91c9e94bf695b1b0d4716c6e5f5a3ca1
+EncID already processed: 91c9e94bf695b1b0d4716c6e5f5a3ca1
+
+------------------> Task 7 <------------------
+Segment 7-A: New DBF created and added to DBF list.
+Current number of DBFs: 4
+
+------------------> Task 7 <------------------
+Segment 7-A: New DBF created and added to DBF list.
+Current number of DBFs: 5
+
+------------------> Task 1 <------------------
+Segment 1: Generated EphID: 95f4a4f3b34d06509602a12dd06f04da
+
+------------------> Task 2 <------------------
+Segment 2: Generated 5 shares for EphID:
+Ephemeral_id used in this segment: 95f4a4f3b34d06509602a12dd06f04da
+  Share 1 : (1, 6a6d1a82280a2b1b7c6b6ac7d2388562)
+  Share 2 : (2, 41aaeffbccf770eaeb549519dc5de2df)
+  Share 3 : (3, be33518a57b05da1013d5ef3de0a6367)
+  Share 4 : (4, 90fced4e68e95b92cab846c5ea7d5f9f)
+  Share 5 : (5, 6f65533ff3ae76d920d18d2fe82ade27)
+Hash: b4b1730797ab260f7af718d7d2d54f665a829c0a39218c75b38b3f792d7ac9c5
+
+------------------> Task 3 <------------------
+Segment 3: Preparing to broadcast Share 1
+Segment 3: Broadcasting share 1
+Segment 3b: Received share 1 for hash b4b1730797ab260f7af718d7d2d54f665a829c0a39218c75b38b3f792d7ac9c5
+Segment 3c: Total shares received for hash b4b1730797ab260f7af718d7d2d54f665a829c0a39218c75b38b3f792d7ac9c5: 1, share value 6a6d1a82280a2b1b7c6b6ac7d2388562
+
+------------------> Task 7 <------------------
+Segment 7-A: New DBF created and added to DBF list.
+Current number of DBFs: 6
+
+------------------> Task 7 <------------------
+Segment 7-B: Removed 1 DBFs older than 60 seconds.
+Remaining DBFs: 5
+
+------------------> Task 8 <------------------
+Segment 8: Combined DBFs into QBF with 9 set bits.
+
+------------------> Task 9 <------------------
+Segment 9: Sent QBF to server and received result: ('intersection ', 'Not Matched')
+No close contacts with diagnosed COVID-19 cases detected.
