@@ -364,6 +364,13 @@ class ShareManager:
                 safe_print(f"Segment 7-B: Removed {removed_dbf_count} DBFs older than {self.dbf_max_age} seconds.")
                 safe_print(f"Remaining DBFs: {len(self.dbf_list)}")
 
+            # Ensure no more than 6 DBFs are stored at any time
+            while len(self.dbf_list) > 6:
+                removed_dbf = self.dbf_list.pop(0)
+                safe_print("\n------------------> Segment 7-B <------------------")
+                safe_print("Task 7-B: Removed the oldest DBF to maintain the limit of 6 DBFs.")
+                safe_print(f"Remaining DBFs: {len(self.dbf_list)}")
+
             ############################## Task 8 ##############################
             # Segment 8:Show that after every 9 minutes, the nodes combine all the available DBFs into a single QBF.
             if current_time - self.last_qbf_time >= self.qbf_interval:
