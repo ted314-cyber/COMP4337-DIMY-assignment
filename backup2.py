@@ -116,6 +116,9 @@ class ShareManager:
         self.last_qbf_time = time.time()
         self.encoded_encID_set = set()
         self.lock = threading.Lock()
+        self.attack_attempts = 0
+        self.legitimate_reconstructions = 0
+        self.start_time = time.time()
 
     def setup_server_socket(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -175,8 +178,9 @@ class ShareManager:
                 if random.random() < 0.1:
                     safe_print(f"Segment 3a: Dropping share {share[0]} with value {share_value_hex}")
                     continue
+                timestamp = int(time.time())
                 share_data = (
-                    f"{share[0]}, {binascii.hexlify(share[1]).decode()}, {self.current_hash}"
+                    f"{share[0]}, {binascii.hexlify(share[1]).decode()}, {self.current_hash}, {timestamp}"
                 )
                 self.server_socket.sendto(share_data.encode(), ("<broadcast>", 37025))
                 safe_print(f"Segment 3: Broadcasting share {share[0]}")  # Moved this line here
@@ -192,25 +196,45 @@ class ShareManager:
         """Listens for shares and processes them."""
         while True:
             data, _ = self.client_socket.recvfrom(1024)
-            share_num, share, recv_hash_ephID = self.parse_share(data.decode())
-            self.process_received_share(share_num, share, recv_hash_ephID)
+            share_num, share, recv_hash_ephID, timestamp = self.parse_share(data.decode())
+            if share_num is None:
+                continue  # Skip invalid data
+            self.process_received_share(share_num, share, recv_hash_ephID, timestamp)
             self.attempt_reconstruction(recv_hash_ephID)
 
     def parse_share(self, data):
         parts = data.split(",")
+        if len(parts) != 4:
+            safe_print(f"Invalid share data received: {data}")
+            return None, None, None, None
         share_num = int(parts[0].strip())
         share = binascii.unhexlify(parts[1].strip())
         recv_hash_ephID = parts[2].strip()
-        return share_num, share, recv_hash_ephID
+        timestamp = int(parts[3].strip())
+        return share_num, share, recv_hash_ephID, timestamp
 
-    def process_received_share(self, share_num, share, recv_hash_ephID):
+    def process_received_share(self, share_num, share, recv_hash_ephID, timestamp):
+        current_time = int(time.time())
+        time_difference = current_time - int(timestamp)
+        safe_print(f"\n------------------> Share Processing <------------------")
+        safe_print(f"Processing share {share_num} for hash {recv_hash_ephID}")
+        safe_print(f"Share timestamp: {timestamp}, Current time: {current_time}")
+        safe_print(f"Time difference: {time_difference} seconds")
+        
+        if time_difference > 30:  # 30 seconds time window
+            self.attack_attempts += 1
+            safe_print(f"\n------------------> ATTACKER DETECTED <------------------")
+            safe_print(f"Discarding old share: {share_num} with timestamp {timestamp}")
+            safe_print(f"Current time: {current_time}, Time difference: {time_difference} seconds")
+            safe_print(f"Total attack attempts detected: {self.attack_attempts}")
+            return
+        
         if recv_hash_ephID not in self.received_shares:
             self.received_shares[recv_hash_ephID] = []
-        self.received_shares[recv_hash_ephID].append((share_num, share))
+        self.received_shares[recv_hash_ephID].append((share_num, share, timestamp))
+        safe_print(f"\n------------------> Task 3 <------------------")
         safe_print(f"Segment 3b: Received share {share_num} for hash {recv_hash_ephID}")
-        safe_print(
-            f"Segment 3c: Total shares received for hash {recv_hash_ephID}: {len(self.received_shares[recv_hash_ephID])}, share value {binascii.hexlify(share).decode()}"
-        )
+        safe_print(f"Segment 3c: Total shares received for hash {recv_hash_ephID}: {len(self.received_shares[recv_hash_ephID])}, share value {binascii.hexlify(share).decode()}")
 
     ############################## Task 4 ##############################
     # Segment 4-A: Show the nodes attempting re-construction of EphID when these have received at least 3 shares.
@@ -221,8 +245,12 @@ class ShareManager:
             safe_print(f"Segment 4-A: Attempting to reconstruct EphID for hash {recv_hash_ephID}")
             safe_print(f"Number of shares available: {len(self.received_shares[recv_hash_ephID])}") 
 
-            shares = self.received_shares[recv_hash_ephID][:3]
-            reconstructed_ephID = Shamir.combine(shares)
+            shares = sorted(self.received_shares[recv_hash_ephID], key=lambda x: x[2])[:3]  # Sort by timestamp and take the first 3
+            safe_print(f"Using shares:")
+            for share_num, share, timestamp in shares:
+                safe_print(f"  Share {share_num}: timestamp {timestamp}")
+
+            reconstructed_ephID = Shamir.combine([(s[0], s[1]) for s in shares])
 
             safe_print(f"Segment 4-B: Verifying reconstructed EphID")
             safe_print(f"Original EphID hash:    {recv_hash_ephID}")
@@ -232,8 +260,10 @@ class ShareManager:
             safe_print(f"Reconstructed hash: {reconstructed_hash}")
 
             if reconstructed_hash == recv_hash_ephID:
+                self.legitimate_reconstructions += 1
                 safe_print(f"Segment 4-B: Verification successful: Reconstructed EphID matches the original!")
                 safe_print(f"Successfully verified EphID: {binascii.hexlify(reconstructed_ephID).decode()}")
+                safe_print(f"Total legitimate reconstructions: {self.legitimate_reconstructions}")
                 self.construct_encID(reconstructed_ephID)  # Task 5
             else:
                 safe_print("Segment 4-B: Verification failed: Reconstructed EphID does not match the original.")
@@ -402,7 +432,19 @@ class ShareManager:
         threading.Thread(
             target=self.manage_dbf_sampling, name="DBFSamplingThread", daemon=True
         ).start()
+        threading.Thread(
+            target=self.print_statistics, name="StatisticsThread", daemon=True
+        ).start()
 
+    def print_statistics(self):
+        while True:
+            time.sleep(60)  # Print statistics every 60 seconds
+            runtime = int(time.time() - self.start_time)
+            safe_print("\n------------------> Statistics <------------------")
+            safe_print(f"Runtime: {runtime} seconds")
+            safe_print(f"Total attack attempts detected: {self.attack_attempts}")
+            safe_print(f"Total legitimate reconstructions: {self.legitimate_reconstructions}")
+            safe_print(f"Current number of DBFs: {len(self.dbf_list)}")
 def main():
     stop_printing = threading.Event()
     print_thread = threading.Thread(target=print_manager, args=(stop_printing,))

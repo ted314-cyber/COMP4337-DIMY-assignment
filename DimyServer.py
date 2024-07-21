@@ -75,7 +75,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serversocket:
     serversocket.listen(5)
     logging.info(f'Server listening on {HOST}:{PORT}')
     
-    while True:  # Infinite loop to accept connections
+    while True:  # Infinite loop to accept connections  
         logging.info('Waiting for connection')
         try:
             clientsocket, addr = serversocket.accept()
