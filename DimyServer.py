@@ -38,35 +38,15 @@ class BloomFilter:
                 return False
         return True
 
-<<<<<<< HEAD
-CBF = BloomFilter()
-
-def uploadEncID(clientsocket: socket.socket, addr: Tuple[str, int]) -> None:
-    global CBF
-=======
 CBFs = []
 
 def uploadEncID(clientsocket: socket.socket, addr: Tuple[str, int]) -> None:
     global CBFs
->>>>>>> f2402dc (Added simulate_positive_case function)
     logging.info(f"Got a connection from {addr}")
     
     try:
         with clientsocket:
             bytes_data = clientsocket.recv(50000)
-<<<<<<< HEAD
-            BF = pickle.loads(bytes_data)  # Deserialize the entire Bloom filter
-            
-            if isinstance(BF, tuple) and BF[0] == 'CBF':
-                CBF = BF[1]
-                clientsocket.send(pickle.dumps('uploaded CBF'))
-            else:
-                encID[addr[1]] = BF
-                intersection = (CBF.bit_array & BF.bit_array).count()
-                logging.info(f'Segment 10: received QBF performing risk analysis {intersection}')
-                result = 'Matched' if intersection > 0 else 'Not Matched'
-                clientsocket.send(pickle.dumps(('intersection ', result)))
-=======
             BF = pickle.loads(bytes_data)
 
             if isinstance(BF, tuple) and BF[0] == 'CBF':
@@ -84,7 +64,6 @@ def uploadEncID(clientsocket: socket.socket, addr: Tuple[str, int]) -> None:
                         break
                 result = 'Matched' if matched else 'Not Matched'
                 clientsocket.send(pickle.dumps(('Result', result)))
->>>>>>> f2402dc (Added simulate_positive_case function)
     except Exception as e:
         logging.error(f"Error handling client {addr}: {e}")
 

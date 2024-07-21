@@ -141,40 +141,20 @@ class ShareManager:
         sock.bind(("", 48000))
         return sock
 
-<<<<<<< HEAD
-    def send_qbf_to_server(self, qbf):
-=======
     def send_qbf_to_server(self, bloom_filter):
->>>>>>> f2402dc (Added simulate_positive_case function)
         server_address = ('localhost', 55000)
         
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect(server_address)
                 
-<<<<<<< HEAD
-                # Serialize and send QBF
-                serialized_qbf = pickle.dumps(qbf)
-                s.sendall(serialized_qbf)
-=======
                 # Serialize and send Bloom Filter
                 serialized_bf = pickle.dumps(bloom_filter)
                 s.sendall(serialized_bf)
->>>>>>> f2402dc (Added simulate_positive_case function)
                 
                 # Receive result
                 result = pickle.loads(s.recv(1024))
                 
-<<<<<<< HEAD
-                safe_print("\n------------------> Task 9 <------------------")
-                safe_print(f"Segment 9: Sent QBF to server and received result: {result}")
-                
-                # Display result to user
-                if result[1] == "Matched":
-                    safe_print("WARNING: You may have been in close contact with someone diagnosed with COVID-19.")
-                else:
-                    safe_print("No close contacts with diagnosed COVID-19 cases detected.")
-=======
                 if isinstance(bloom_filter, tuple) and bloom_filter[0] == 'CBF':
                     safe_print("\n------------------> Task 10 <------------------")
                     safe_print("Segment 10-B: Received confirmation from server. Upload successful.")
@@ -188,7 +168,6 @@ class ShareManager:
                         safe_print("Segment 9: WARNING: You may have been in close contact with someone diagnosed with COVID-19.")
                     else:
                         safe_print("Segment 9: No close contacts with diagnosed COVID-19 cases detected.")
->>>>>>> f2402dc (Added simulate_positive_case function)
         
         except Exception as e:
             safe_print(f"Error communicating with server: {e}")
@@ -498,12 +477,9 @@ class ShareManager:
             target=self.manage_dbf_sampling, name="DBFSamplingThread", daemon=True
         ).start()
         threading.Thread(
-<<<<<<< HEAD
-=======
         target=self.input_listener, name="InputListenerThread", daemon=True
         ).start()
         threading.Thread(
->>>>>>> f2402dc (Added simulate_positive_case function)
             target=self.print_statistics, name="StatisticsThread", daemon=True
         ).start()
 
