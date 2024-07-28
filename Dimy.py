@@ -180,7 +180,7 @@ class ShareManager:
                 share_value_hex = binascii.hexlify(share[1]).decode()
                 safe_print("\n------------------> Task 3 <------------------")
                 safe_print("Segment 3: Preparing to broadcast Share", share[0])
-                if random.random() < 0.1:
+                if random.random() < 0.5:
                     safe_print(f"Segment 3a: Dropping share {share[0]} with value {share_value_hex}")
                     continue
                 timestamp = int(time.time())
